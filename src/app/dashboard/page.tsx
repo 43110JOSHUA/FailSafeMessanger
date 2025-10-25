@@ -10,10 +10,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="">
+    <div className="min-vh-100">
       <h1 className="text-center">Personal Dashboard</h1>
-      <button className="btn btn-primary" onClick={setToggle}> Click Me!</button>
-      <NewMessage isOpen={isOpen}/>
+      <NewMessage/>
     </div>
   );
 }
