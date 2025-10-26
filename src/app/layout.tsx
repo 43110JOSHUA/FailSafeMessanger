@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import 'bootstrap/dist/css/bootstrap.min.css'; 
-import PageBorder from "../components/PageBorder";
+import PageBorder from "@/components/PageBorder";
 
 export const metadata: Metadata = {
   title: "Fail Safe",

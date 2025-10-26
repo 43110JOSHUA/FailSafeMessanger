@@ -1,0 +1,120 @@
+import "server-only";
+import { Pool, QueryResult, QueryResultRow } from "pg";
+
+declare global {
+    var pgPool: Pool | undefined;
+
+    namespace NodeJS {
+        interface ProcessEnv {
+            DB_HOST: string;
+            DB_USER: string;
+            DB_PORT?: string;
+            DB_DATABASE: string;
+            DB_PASSWORD: string;
+        }
+
+        interface Global {
+            pgPool?: Pool;
+        }
+    }
+}
+
+// Define the database interface
+
+interface Database{
+    query<T extends QueryResultRow = any>(
+        text: string,
+        params?: any[]
+    ): Promise<QueryResult<T>>;
+    getPool(): Pool;
+    end(): Promise<void>;
+}
+
+const poolConfig = {
+    max: 20, // set pool max size to 20
+    idleTimeoutMillis: 30000, // close idle clients after 30 seconds
+    connectionTimeoutMillis: 2000, // return an error after 2 seconds if connection could not be established
+    host: process.env.PGHOST,
+    user: process.env.PGUSER,
+    port: process.env.PGPORT ? parseInt(process.env.PGPORT, 10) : undefined,
+    database: process.env.PGDATABASE,
+    password: process.env.PGPASSWORD,
+}
+
+const getPool = (): Pool => {
+    // Check if we already have a pool
+    if (!global.pgPool) {
+        global.pgPool = new Pool(poolConfig);
+
+        // Set up error handler
+        global.pgPool.on("error", (err: Error) => {
+            console.error("Unexpected error on idle client", err);
+            process.exit(-1);
+        });
+
+        // For dev environments: handle hot reloading
+        if (process.env.NODE_ENV === "development") {
+            // clean up pool on module reload
+            // @ts-ignore
+            module.hot.dispose(() => {
+                if (global.pgPool) {
+                    global.pgPool.end();
+                    global.pgPool = undefined;
+                }
+            });
+        }
+    }
+
+    return global.pgPool;
+};
+
+// Function to initialize the database
+const initDb = async (): Promise<void> => {
+    const pool = getPool();
+    const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS messages (
+            id SERIAL PRIMARY KEY,
+            recipient_email VARCHAR(255) NOT NULL,
+            deadman_duration INT NOT NULL,
+            message_content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    `;
+    try {
+        await pool.query(createTableQuery);
+        console.log("Database initialized");
+    } catch (error) {
+        console.error("Error initializing database:", error);
+        throw error;
+    }
+};
+
+// Initialize the database when this module is loaded
+initDb().catch((err) => {
+    console.error("Failed to initialize database:", err);
+    process.exit(1);
+});
+
+// Create the database object with all methods
+const db: Database = {
+    query: async <T extends QueryResultRow = any>(
+        text: string,
+        params?: any[]
+    ): Promise<QueryResult<T>> => {
+        const pool = getPool();
+        return pool.query<T>(text, params);
+    },
+
+    getPool: (): Pool => {
+        return getPool();
+    },
+
+    end: async (): Promise<void> => {
+        if (global.pgPool) {
+            await global.pgPool.end();
+            global.pgPool = undefined;
+        }
+    },
+};
+
+export default db;

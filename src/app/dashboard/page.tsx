@@ -1,5 +1,5 @@
 import { get } from "http";
-import NewMessage from "../../components/messageDashboard/NewMessage";
+import NewMessage from "@/components/messageDashboard/NewMessage";
 
 export default async function Dashboard() {
   // Fetch messages from server
