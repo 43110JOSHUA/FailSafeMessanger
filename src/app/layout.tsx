@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import 'bootstrap/dist/css/bootstrap.min.css'; 
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 import PageBorder from "@/components/PageBorder";
+import { AuthProvider } from "@/context/auth";
 
 export const metadata: Metadata = {
   title: "Fail Safe",
@@ -16,9 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="">
-        <PageBorder>
-        {children}
-        </PageBorder>
+        <AuthProvider>
+          <PageBorder>{children}</PageBorder>
+        </AuthProvider>
       </body>
     </html>
   );

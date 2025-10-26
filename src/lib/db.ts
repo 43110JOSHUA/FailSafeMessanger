@@ -71,18 +71,51 @@ const getPool = (): Pool => {
 // Function to initialize the database
 const initDb = async (): Promise<void> => {
     const pool = getPool();
-    const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS messages (
-            id SERIAL PRIMARY KEY,
-            recipient_email VARCHAR(255) NOT NULL,
-            deadman_duration INT NOT NULL,
-            message_content TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    
+    // Create users table first
+    const createUsersTableQuery = `
+        CREATE TABLE IF NOT EXISTS users (
+            id VARCHAR(255) PRIMARY KEY, -- Google user ID
+            email VARCHAR(255) UNIQUE NOT NULL,
+            name VARCHAR(255),
+            picture VARCHAR(500), -- Google profile picture URL
+            subscription_tier VARCHAR(50) DEFAULT 'free',
+            stripe_customer_id VARCHAR(255), -- For Stripe integration
+            last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     `;
+    
+    // Create messages table with user reference
+    const createMessagesTableQuery = `
+        CREATE TABLE IF NOT EXISTS messages (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            user_id VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            recipient_email VARCHAR(255) NOT NULL,
+            message_content TEXT NOT NULL,
+            deadman_duration INT NOT NULL, -- days
+            status VARCHAR(50) DEFAULT 'active', -- active, paused, sent, cancelled
+            last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            scheduled_send_date TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    `;
+    
+    // Create indexes for better performance
+    const createIndexesQuery = `
+        CREATE INDEX IF NOT EXISTS idx_messages_user_id ON messages(user_id);
+        CREATE INDEX IF NOT EXISTS idx_messages_status ON messages(status);
+        CREATE INDEX IF NOT EXISTS idx_messages_scheduled_send ON messages(scheduled_send_date);
+        CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+    `;
+    
     try {
-        await pool.query(createTableQuery);
-        console.log("Database initialized");
+        await pool.query(createUsersTableQuery);
+        await pool.query(createMessagesTableQuery);
+        await pool.query(createIndexesQuery);
+        console.log("Database initialized with users and messages tables");
     } catch (error) {
         console.error("Error initializing database:", error);
         throw error;
