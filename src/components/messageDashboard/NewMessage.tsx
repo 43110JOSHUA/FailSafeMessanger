@@ -1,3 +1,4 @@
+"use client"; 
 import React, { useState } from "react";
 
 export default function NewMessage() {
@@ -6,7 +7,7 @@ export default function NewMessage() {
   const [deadmanDuration, setDeadmanDuration] = useState("60"); // days
 
   return (
-    <div className="card my-4 shadow-sm">
+    <div className="card my-4 mx-2 shadow-sm">
       <div className="card-header d-flex justify-content-between align-items-center">
         <h5 className="card-title mb-0">Create New Failsafe Message</h5>
       </div>
