@@ -24,8 +24,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user ?? null);
+
+      // Save user to database when they sign in
+      if (user) {
+        try {
+          const { addUser } = await import("../lib/actions");
+          await addUser({
+            id: user.uid,
+            email: user.email!,
+            name: user.displayName || undefined,
+          });
+        } catch (error) {
+          console.error("Failed to save user to database:", error);
+        }
+      }
+
       setLoading(false);
     });
 

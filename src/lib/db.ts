@@ -39,6 +39,9 @@ const poolConfig = {
     port: process.env.PGPORT ? parseInt(process.env.PGPORT, 10) : undefined,
     database: process.env.PGDATABASE,
     password: process.env.PGPASSWORD,
+    ssl: {
+        rejectUnauthorized: false, // For hosted PostgreSQL services
+    },
 }
 
 const getPool = (): Pool => {
@@ -52,16 +55,9 @@ const getPool = (): Pool => {
             process.exit(-1);
         });
 
-        // For dev environments: handle hot reloading
+        // For dev environments: log pool creation
         if (process.env.NODE_ENV === "development") {
-            // clean up pool on module reload
-            // @ts-ignore
-            module.hot.dispose(() => {
-                if (global.pgPool) {
-                    global.pgPool.end();
-                    global.pgPool = undefined;
-                }
-            });
+            console.log("Creating new PostgreSQL connection pool");
         }
     }
 
@@ -79,7 +75,7 @@ const initDb = async (): Promise<void> => {
             email VARCHAR(255) UNIQUE NOT NULL,
             name VARCHAR(255),
             subscription_tier VARCHAR(50) DEFAULT 'free',
-            stripe_customer_id VARCHAR(255), -- For Stripe integration
+            stripe_customer_id VARCHAR(255) -- For Stripe integration
         );
     `;
     
@@ -91,9 +87,8 @@ const initDb = async (): Promise<void> => {
             recipient_email VARCHAR(255) NOT NULL,
             message_content TEXT NOT NULL,
             deadman_duration INT NOT NULL, -- days
-            status VARCHAR(50) DEFAULT 'active', -- active, paused, sent, cancelled
+            status VARCHAR(50) DEFAULT 'active', -- active, sent, cancelled
             last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            scheduled_send_date TIMESTAMP,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );

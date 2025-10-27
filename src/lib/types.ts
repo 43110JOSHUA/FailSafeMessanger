@@ -13,8 +13,7 @@ export interface Message {
   messageContent: string;
   deadmanDuration: number; // in days
   status: 'active' | 'paused' | 'sent';
-  lastActivity: Date;
-  scheduledSendDate?: Date;
+  lastActivity: Date
   createdAt: Date;
 }
 
