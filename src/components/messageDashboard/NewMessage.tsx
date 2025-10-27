@@ -1,15 +1,53 @@
 "use client";
 import React, { useState } from "react";
+import { useAuth } from "@/context/auth";
+import { addMessage } from "@/lib/actions";
 
 interface NewMessageProps {
   isOpen: boolean;
   onClose?: () => void;
+  onMessageCreated?: () => void; // Callback to refresh message list
 }
 
-export default function NewMessage({ isOpen, onClose }: NewMessageProps) {
+export default function NewMessage({
+  isOpen,
+  onClose,
+  onMessageCreated,
+}: NewMessageProps) {
+  const { user } = useAuth();
   const [recipientEmail, setRecipientEmail] = useState("");
   const [messageContent, setMessageContent] = useState("");
   const [deadmanDuration, setDeadmanDuration] = useState("60"); // days
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    if (!user) {
+      return;
+    }
+
+    try {
+      await addMessage(user?.uid, {
+        recipientEmail,
+        messageContent,
+        deadmanDuration: parseInt(deadmanDuration),
+      });
+
+      // Reset form
+      setRecipientEmail("");
+      setMessageContent("");
+      setDeadmanDuration("60");
+
+      // Call callbacks
+      if (onMessageCreated) {
+        onMessageCreated();
+      }
+      if (onClose) {
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error creating message:", error);
+      alert("Failed to create message. Please try again.");
+    }
+  };
 
   if (!isOpen) {
     return null;
@@ -35,7 +73,7 @@ export default function NewMessage({ isOpen, onClose }: NewMessageProps) {
           </div>
 
           <div className="modal-body">
-            <form>
+            <form onSubmit={handleSubmit}>
               {/* Recipient Email */}
               <div className="row mb-3">
                 <div className="col-md-8">
@@ -101,8 +139,12 @@ export default function NewMessage({ isOpen, onClose }: NewMessageProps) {
                 Cancel
               </button>
             )}
-            <button type="submit" className="btn btn-primary">
-              Create Message
+            <button
+              type="submit"
+              className="btn btn-primary"
+              onClick={handleSubmit}
+            >
+              Submit
             </button>
           </div>
         </div>

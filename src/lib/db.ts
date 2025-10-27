@@ -89,8 +89,7 @@ const initDb = async (): Promise<void> => {
             deadman_duration INT NOT NULL, -- days
             status VARCHAR(50) DEFAULT 'active', -- active, sent, cancelled
             last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     `; 
     

@@ -2,12 +2,14 @@
 import { useState } from "react";
 import { useAuth } from "@/context/auth";
 import NewMessage from "@/components/messageDashboard/NewMessage";
+import MessageFeed from "@/components/messageDashboard/MessageFeed";
 import LoginModal from "@/components/login/LoginModal";
 import Logout from "@/components/login/Logout";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const [showNewMessage, setShowNewMessage] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // User is authenticated - show dashboard
   return (
@@ -21,11 +23,8 @@ export default function Dashboard() {
             <Logout />
             <div className="d-flex justify-content-between align-items-center">
               <div className="d-flex align-items-center">
-        
                 <div>
-                  <h6 className="mb-0">
-                    Welcome, {user?.displayName}
-                  </h6>
+                  <h6 className="mb-0">Welcome, {user?.displayName}</h6>
                   <small className="text-muted">{user?.email}</small>
                 </div>
               </div>
@@ -39,24 +38,10 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Messages List - Placeholder */}
+        {/* Messages Feed */}
         <div className="row">
           <div className="col">
-            <div className="card">
-              <div className="card-body text-center py-5">
-                <i className="bi bi-envelope-paper display-4 text-muted mb-3"></i>
-                <h5 className="text-muted">No messages yet</h5>
-                <p className="text-muted">
-                  Create your first failsafe message to get started.
-                </p>
-                <button
-                  className="btn btn-outline-primary"
-                  onClick={() => setShowNewMessage(true)}
-                >
-                  Create Message
-                </button>
-              </div>
-            </div>
+            <MessageFeed refreshTrigger={refreshTrigger} />
           </div>
         </div>
 
@@ -64,6 +49,10 @@ export default function Dashboard() {
         <NewMessage
           isOpen={showNewMessage}
           onClose={() => setShowNewMessage(false)}
+          onMessageCreated={() => {
+            // Trigger MessageFeed refresh when new message is created
+            setRefreshTrigger((prev) => prev + 1);
+          }}
         />
       </div>
     </div>

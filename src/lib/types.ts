@@ -2,23 +2,23 @@ export interface User {
   id: string; // Google user ID
   email: string;
   name?: string;
-  subscriptionTier: 'free' | 'paid';
-  stripeCustomerId?: string;
+  subscription_ier: 'free' | 'paid';
+  stripe_customer_id?: string;
 }
 
 export interface Message {
   id: string;
-  userId: string;
-  recipientEmail: string;
-  messageContent: string;
-  deadmanDuration: number; // in days
+  user_id: string;
+  recipient_email: string;
+  message_content: string;
+  deadman_duration: number; // in days
   status: 'active' | 'paused' | 'sent';
-  lastActivity: Date
-  createdAt: Date;
+  last_activity: Date
+  created_at: Date;
 }
 
 export interface MessageFormData {
-  recipientEmail: string;
-  messageContent: string;
-  deadmanDuration: number;
+  recipient_email: string;
+  message_content: string;
+  deadman_duration: number;
 }

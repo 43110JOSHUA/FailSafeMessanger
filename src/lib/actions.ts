@@ -43,7 +43,37 @@ export async function addUser(userData: {
     }
 }
 
-// export async function addMessage()
+export async function addMessage(
+    userId: string,
+    messageData: {
+        recipientEmail: string;
+        messageContent: string;
+        deadmanDuration: number;
+    }
+): Promise<Message | null> {
+    try {
+        const result = await db.query<Message>(
+            `INSERT INTO messages (user_id, recipient_email, message_content, deadman_duration)
+             VALUES ($1, $2, $3, $4)
+             RETURNING *`,
+            [
+                userId,
+                messageData.recipientEmail,
+                messageData.messageContent,
+                messageData.deadmanDuration
+            ]
+        );
+
+        if (result.rows.length > 0) {
+            return result.rows[0];
+        }
+        
+        return null;
+    } catch (error) {
+        console.error("Error adding message:", error);
+        throw new Error("Failed to create message");
+    }
+}
 
 // export async function deleteMessage()
 
