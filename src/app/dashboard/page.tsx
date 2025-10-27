@@ -41,7 +41,7 @@ export default function Dashboard() {
         {/* Messages Feed */}
         <div className="row">
           <div className="col">
-            <MessageFeed refreshTrigger={refreshTrigger} />
+            <MessageFeed/>
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 "use server";
 import type { Message, User } from "./types";
+import { revalidatePath } from "next/cache";
 import db from "./db";
 
 export async function getMessages(userId: string): Promise<Message[]> {
@@ -63,12 +64,9 @@ export async function addMessage(
                 messageData.deadmanDuration
             ]
         );
-
-        if (result.rows.length > 0) {
-            return result.rows[0];
-        }
-        
-        return null;
+				revalidatePath("/dashboard");
+				return result.rows[0];
+     
     } catch (error) {
         console.error("Error adding message:", error);
         throw new Error("Failed to create message");

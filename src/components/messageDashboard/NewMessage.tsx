@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useAuth } from "@/context/auth";
 import { addMessage } from "@/lib/actions";
+import { on } from "events";
 
 interface NewMessageProps {
   isOpen: boolean;
@@ -9,11 +10,7 @@ interface NewMessageProps {
   onMessageCreated?: () => void; // Callback to refresh message list
 }
 
-export default function NewMessage({
-  isOpen,
-  onClose,
-  onMessageCreated,
-}: NewMessageProps) {
+export default function NewMessage({ isOpen, onClose }: NewMessageProps) {
   const { user } = useAuth();
   const [recipientEmail, setRecipientEmail] = useState("");
   const [messageContent, setMessageContent] = useState("");
@@ -23,30 +20,13 @@ export default function NewMessage({
     if (!user) {
       return;
     }
+    addMessage(user?.uid, {
+      recipientEmail,
+      messageContent,
+      deadmanDuration: parseInt(deadmanDuration),
+    });
 
-    try {
-      await addMessage(user?.uid, {
-        recipientEmail,
-        messageContent,
-        deadmanDuration: parseInt(deadmanDuration),
-      });
-
-      // Reset form
-      setRecipientEmail("");
-      setMessageContent("");
-      setDeadmanDuration("60");
-
-      // Call callbacks
-      if (onMessageCreated) {
-        onMessageCreated();
-      }
-      if (onClose) {
-        onClose();
-      }
-    } catch (error) {
-      console.error("Error creating message:", error);
-      alert("Failed to create message. Please try again.");
-    }
+    onClose?.();
   };
 
   if (!isOpen) {
@@ -63,15 +43,12 @@ export default function NewMessage({
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Create New Failsafe Message</h5>
-            {onClose && (
-              <button
-                type="button"
-                className="btn-close"
-                onClick={onClose}
-              ></button>
-            )}
+            <button
+              type="button"
+              className="btn-close"
+              onClick={onClose}
+            ></button>
           </div>
-
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
               {/* Recipient Email */}
@@ -130,15 +107,14 @@ export default function NewMessage({
           </div>
 
           <div className="modal-footer">
-            {onClose && (
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={onClose}
-              >
-                Cancel
-              </button>
-            )}
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+
             <button
               type="submit"
               className="btn btn-primary"
