@@ -97,20 +97,11 @@ const initDb = async (): Promise<void> => {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
-    `;
-    
-    // Create indexes for better performance
-    const createIndexesQuery = `
-        CREATE INDEX IF NOT EXISTS idx_messages_user_id ON messages(user_id);
-        CREATE INDEX IF NOT EXISTS idx_messages_status ON messages(status);
-        CREATE INDEX IF NOT EXISTS idx_messages_scheduled_send ON messages(scheduled_send_date);
-        CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-    `;
+    `; 
     
     try {
         await pool.query(createUsersTableQuery);
         await pool.query(createMessagesTableQuery);
-        await pool.query(createIndexesQuery);
         console.log("Database initialized with users and messages tables");
     } catch (error) {
         console.error("Error initializing database:", error);
