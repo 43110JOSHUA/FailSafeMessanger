@@ -2,12 +2,10 @@
 import React, { useState } from "react";
 import { useAuth } from "@/context/auth";
 import { addMessage } from "@/lib/actions";
-import { on } from "events";
 
 interface NewMessageProps {
   isOpen: boolean;
   onClose?: () => void;
-  onMessageCreated?: () => void; // Callback to refresh message list
 }
 
 export default function NewMessage({ isOpen, onClose }: NewMessageProps) {
@@ -25,6 +23,11 @@ export default function NewMessage({ isOpen, onClose }: NewMessageProps) {
       messageContent,
       deadmanDuration: parseInt(deadmanDuration),
     });
+
+    // Refresh message feed
+    if ((window as any).refreshMessages) {
+      (window as any).refreshMessages();
+    }
 
     onClose?.();
   };

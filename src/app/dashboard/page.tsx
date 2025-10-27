@@ -9,7 +9,6 @@ import Logout from "@/components/login/Logout";
 export default function Dashboard() {
   const { user } = useAuth();
   const [showNewMessage, setShowNewMessage] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // User is authenticated - show dashboard
   return (
@@ -49,10 +48,6 @@ export default function Dashboard() {
         <NewMessage
           isOpen={showNewMessage}
           onClose={() => setShowNewMessage(false)}
-          onMessageCreated={() => {
-            // Trigger MessageFeed refresh when new message is created
-            setRefreshTrigger((prev) => prev + 1);
-          }}
         />
       </div>
     </div>

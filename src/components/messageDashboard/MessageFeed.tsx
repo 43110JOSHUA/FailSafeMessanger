@@ -8,12 +8,25 @@ import OldMessage from "./OldMessage";
 export default function MessageFeed() {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshMessages = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
 
   useEffect(() => {
     if (user) {
       getMessages(user.uid).then(setMessages);
     }
-  }, [user]);
+  }, [user, refreshKey]);
+
+  // Expose refresh function globally
+  useEffect(() => {
+    (window as any).refreshMessages = refreshMessages;
+    return () => {
+      delete (window as any).refreshMessages;
+    };
+  }, []);
 
   if (user && messages.length > 0) {
     return (
