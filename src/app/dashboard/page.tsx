@@ -9,24 +9,10 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [showNewMessage, setShowNewMessage] = useState(false);
 
-  // Show login modal if user is not authenticated
-  if (!user) {
-    return (
-      <>
-        <div className="min-vh-100 d-flex align-items-center justify-content-center">
-          <div className="text-center">
-            <h2 className="text-muted">Please sign in to continue</h2>
-          </div>
-        </div>
-        <LoginModal />
-      </>
-    );
-  }
-
   // User is authenticated - show dashboard
   return (
     <div className="min-vh-100">
-  
+      {!user && <LoginModal />}
       <div className="container py-4">
         {/* Dashboard Header */}
         <div className="row mb-4">
@@ -35,20 +21,12 @@ export default function Dashboard() {
             <Logout />
             <div className="d-flex justify-content-between align-items-center">
               <div className="d-flex align-items-center">
-                {user.photoURL && (
-                  <img
-                    src={user.photoURL}
-                    alt="Profile"
-                    className="rounded-circle me-2"
-                    width="40"
-                    height="40"
-                  />
-                )}
+        
                 <div>
                   <h6 className="mb-0">
-                    Welcome, {user.displayName || user.email}
+                    Welcome, {user?.displayName}
                   </h6>
-                  <small className="text-muted">{user.email}</small>
+                  <small className="text-muted">{user?.email}</small>
                 </div>
               </div>
               <button

@@ -78,12 +78,8 @@ const initDb = async (): Promise<void> => {
             id VARCHAR(255) PRIMARY KEY, -- Google user ID
             email VARCHAR(255) UNIQUE NOT NULL,
             name VARCHAR(255),
-            picture VARCHAR(500), -- Google profile picture URL
             subscription_tier VARCHAR(50) DEFAULT 'free',
             stripe_customer_id VARCHAR(255), -- For Stripe integration
-            last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     `;
     
