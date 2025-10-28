@@ -1,11 +1,23 @@
+"use client";
+
 import React from "react";
 import { Message } from "@/lib/types";
+import { deleteMessage } from "@/lib/actions";
 
 interface OldMessageProps {
   message: Message;
 }
 
 export default function OldMessage({ message }: OldMessageProps) {
+  async function handleDelete() {
+    await deleteMessage(message.id); 
+    // Refresh message feed
+    if ((window as any).refreshMessages) {
+      (window as any).refreshMessages();
+    } 
+  };
+  
+
   // Format dates for display
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -57,13 +69,12 @@ export default function OldMessage({ message }: OldMessageProps) {
         </div>
 
         {/* Message Details */}
-        <div className="row">
-          <div className="col-md-6">
-            <small className="text-muted d-block">
-              <strong>Deadman Duration:</strong> {message.deadman_duration} day
-              {message.deadman_duration !== 1 ? "s" : ""}
-            </small>
-          </div>
+        <div className="d-flex justify-content-between align-items-center">
+          <small className="text-muted d-block">
+            <strong>Deadman Duration:</strong> {message.deadman_duration} day
+            {message.deadman_duration !== 1 ? "s" : ""}
+          </small>
+          <button className="btn btn-danger" onClick={handleDelete}>Delete</button>
         </div>
       </div>
     </div>

@@ -14,7 +14,7 @@ export default function NewMessage({ isOpen, onClose }: NewMessageProps) {
   const [messageContent, setMessageContent] = useState("");
   const [deadmanDuration, setDeadmanDuration] = useState("60"); // days
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit() {
     if (!user) {
       return;
     }
@@ -27,7 +27,7 @@ export default function NewMessage({ isOpen, onClose }: NewMessageProps) {
     // Refresh message feed
     if ((window as any).refreshMessages) {
       (window as any).refreshMessages();
-    }
+    } 
 
     onClose?.();
   };

@@ -1,6 +1,5 @@
 "use server";
 import type { Message, User } from "./types";
-import { revalidatePath } from "next/cache";
 import db from "./db";
 
 export async function getMessages(userId: string): Promise<Message[]> {
@@ -64,7 +63,6 @@ export async function addMessage(
                 messageData.deadmanDuration
             ]
         );
-				revalidatePath("/dashboard");
 				return result.rows[0];
      
     } catch (error) {
@@ -73,6 +71,17 @@ export async function addMessage(
     }
 }
 
-// export async function deleteMessage()
+export async function deleteMessage(messageId: string): Promise<void> {
+    try {
+        await db.query(
+            `DELETE FROM messages WHERE id = $1`,
+            [messageId]
+        );
+    } 
+    catch (error) {
+        console.error("Error deleting message:", error);
+        throw new Error("Failed to delete message");
+    }
+}
 
 // export async function updateMessage()
