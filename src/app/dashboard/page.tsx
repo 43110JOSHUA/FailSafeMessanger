@@ -7,7 +7,7 @@ import LoginModal from "@/components/login/LoginModal";
 import Logout from "@/components/login/Logout";
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
   const [showNewMessage, setShowNewMessage] = useState(false);
 
   // User is authenticated - show dashboard
@@ -22,9 +22,14 @@ export default function Dashboard() {
             <Logout />
             <div className="d-flex justify-content-between align-items-center">
               <div className="d-flex align-items-center">
-                <div>
+                <div className="d-flex flex-column">
                   <h6 className="mb-0">Welcome, {user?.displayName}</h6>
-                  <small className="text-muted">{user?.email}</small>
+                  <div>
+                    <small className="text-muted">{user?.email}</small>
+                    <small className="text-muted">
+                      {" • "}{dbUser?.subscription_tier} plan
+                    </small>
+                  </div>
                 </div>
               </div>
               <button
@@ -40,7 +45,7 @@ export default function Dashboard() {
         {/* Messages Feed */}
         <div className="row">
           <div className="col">
-            <MessageFeed/>
+            <MessageFeed />
           </div>
         </div>
 

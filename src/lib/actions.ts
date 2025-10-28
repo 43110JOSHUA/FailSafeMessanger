@@ -2,6 +2,7 @@
 import type { Message, User } from "./types";
 import db from "./db";
 
+// MESSAGE ACTIONS
 export async function getMessages(userId: string): Promise<Message[]> {
     try {
         const result = await db.query<Message>(
@@ -12,34 +13,6 @@ export async function getMessages(userId: string): Promise<Message[]> {
     } catch (error) {
         console.error("Error fetching messages:", error);
         return [];
-    }
-}
-
-export async function addUser(userData: {
-    id: string;
-    email: string;
-    name?: string;
-}): Promise<User | null> {
-    try {
-        // Use UPSERT (INSERT ... ON CONFLICT) to handle both new and existing users
-        const result = await db.query<User>(
-            `INSERT INTO users (id, email, name)
-             VALUES ($1, $2, $3)
-             ON CONFLICT (id) DO UPDATE SET
-                email = EXCLUDED.email,
-                name = EXCLUDED.name
-             RETURNING *`,
-            [userData.id, userData.email, userData.name || null]
-        );
-
-        if (result.rows.length > 0) {
-            return result.rows[0];
-        }
-        
-        return null;
-    } catch (error) {
-        console.error("Error adding/updating user:", error);
-        throw new Error("Failed to save user to database");
     }
 }
 
@@ -85,3 +58,48 @@ export async function deleteMessage(messageId: string): Promise<void> {
 }
 
 // export async function updateMessage()
+
+// USER ACTIONS
+export async function addUser(userData: {
+    id: string;
+    email: string;
+    name?: string;
+}): Promise<User | null> {
+    try {
+        // Use UPSERT (INSERT ... ON CONFLICT) to handle both new and existing users
+        const result = await db.query<User>(
+            `INSERT INTO users (id, email, name)
+             VALUES ($1, $2, $3)
+             ON CONFLICT (id) DO UPDATE SET
+                email = EXCLUDED.email,
+                name = EXCLUDED.name
+             RETURNING *`,
+            [userData.id, userData.email, userData.name || null]
+        );
+
+        if (result.rows.length > 0) {
+            return result.rows[0];
+        }
+        
+        return null;
+    } catch (error) {
+        console.error("Error adding/updating user:", error);
+        throw new Error("Failed to save user to database");
+    }
+}
+
+export async function getUserById(userId: string): Promise<User | null> {
+    try {
+        const result = await db.query<User>(
+            `SELECT * FROM users WHERE id = $1`,
+            [userId]
+        );
+        if (result.rows.length > 0) {
+            return result.rows[0];
+        }
+        return null;
+    } catch (error) {
+        console.error("Error fetching user by ID:", error);
+        return null;
+    }
+}

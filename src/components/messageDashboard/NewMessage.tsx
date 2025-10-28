@@ -27,10 +27,10 @@ export default function NewMessage({ isOpen, onClose }: NewMessageProps) {
     // Refresh message feed
     if ((window as any).refreshMessages) {
       (window as any).refreshMessages();
-    } 
+    }
 
     onClose?.();
-  };
+  }
 
   if (!isOpen) {
     return null;
@@ -38,8 +38,7 @@ export default function NewMessage({ isOpen, onClose }: NewMessageProps) {
 
   return (
     <div
-      className="modal fade show d-block"
-      tabIndex={-1}
+      className="modal d-block"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
     >
       <div className="modal-dialog modal-lg modal-dialog-centered">
