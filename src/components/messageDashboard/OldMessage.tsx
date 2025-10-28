@@ -10,13 +10,12 @@ interface OldMessageProps {
 
 export default function OldMessage({ message }: OldMessageProps) {
   async function handleDelete() {
-    await deleteMessage(message.id); 
+    await deleteMessage(message.id);
     // Refresh message feed
     if ((window as any).refreshMessages) {
       (window as any).refreshMessages();
-    } 
-  };
-  
+    }
+  }
 
   // Format dates for display
   const formatDate = (date: Date) => {
@@ -63,7 +62,7 @@ export default function OldMessage({ message }: OldMessageProps) {
 
       <div className="card-body">
         {/* Message Content */}
-        <div className="mb-3">
+        <div className="mb-2">
           <h6 className="card-subtitle mb-2 text-muted">Message:</h6>
           <p className="card-text">{message.message_content}</p>
         </div>
@@ -74,7 +73,14 @@ export default function OldMessage({ message }: OldMessageProps) {
             <strong>Deadman Duration:</strong> {message.deadman_duration} day
             {message.deadman_duration !== 1 ? "s" : ""}
           </small>
-          <button className="btn btn-danger" onClick={handleDelete}>Delete</button>
+          <div className="d-flex gap-1">
+            <button className="btn btn-primary" onClick={() => {}}>
+              Update
+            </button>
+            <button className="btn btn-danger" onClick={handleDelete}>
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>
