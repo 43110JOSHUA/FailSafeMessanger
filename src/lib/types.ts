@@ -2,6 +2,7 @@ export interface User {
   id: string; // Google user ID
   email: string;
   name?: string;
+  last_checkin: Date;
   subscription_tier: 'free' | 'paid';
   stripe_customer_id?: string;
 }

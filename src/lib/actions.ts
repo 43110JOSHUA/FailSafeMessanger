@@ -64,6 +64,7 @@ export async function addUser(userData: {
     id: string;
     email: string;
     name?: string;
+    last_checkin?: Date;
 }): Promise<User | null> {
     try {
         // Use UPSERT (INSERT ... ON CONFLICT) to handle both new and existing users

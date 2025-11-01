@@ -74,6 +74,7 @@ const initDb = async (): Promise<void> => {
             id VARCHAR(255) PRIMARY KEY, -- Google user ID
             email VARCHAR(255) UNIQUE NOT NULL,
             name VARCHAR(255),
+            last_checkin TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             subscription_tier VARCHAR(50) DEFAULT 'free',
             stripe_customer_id VARCHAR(255) -- For Stripe integration
         );
