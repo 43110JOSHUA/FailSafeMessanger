@@ -6,7 +6,7 @@ import { useAuth } from "@/context/auth";
 import OldMessage from "./OldMessage";
 
 export default function MessageFeed() {
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -15,10 +15,10 @@ export default function MessageFeed() {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && dbUser) {
       getMessages(user.uid).then(setMessages);
     }
-  }, [user, refreshKey]);
+  }, [user, dbUser, refreshKey]);
 
   // Expose refresh function globally
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function MessageFeed() {
     };
   }, []);
 
-  if (user && messages.length > 0) {
+  if (user && dbUser && messages.length > 0) {
     return (
       <div>
         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -36,7 +36,7 @@ export default function MessageFeed() {
         </div>
 
         {messages.map((message) => (
-          <OldMessage key={message.id} message={message} />
+          <OldMessage key={message.id} message={message} user={dbUser!} />
         ))}
       </div>
     );

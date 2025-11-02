@@ -25,9 +25,12 @@ export default function Dashboard() {
                 <div className="d-flex flex-column">
                   <h6 className="mb-0">Welcome, {user?.displayName}</h6>
                   <div>
-                    <small className="text-muted">{user?.email}</small>
                     <small className="text-muted">
-                      {" • "}{dbUser?.subscription_tier} plan
+                      {user?.email || "User"}
+                    </small>
+                    <small className="text-muted">
+                      {" • "}
+                      {dbUser?.subscription_tier} plan
                     </small>
                   </div>
                 </div>
